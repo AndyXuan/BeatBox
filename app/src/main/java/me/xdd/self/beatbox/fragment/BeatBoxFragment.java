@@ -11,13 +11,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import me.xdd.self.beatbox.R;
 import me.xdd.self.beatbox.databinding.FragmentBeatBoxBinding;
 import me.xdd.self.beatbox.databinding.ListItemSoundBinding;
+import me.xdd.self.beatbox.model.BeatBox;
+import me.xdd.self.beatbox.model.Sound;
+import me.xdd.self.beatbox.viewmodel.SoundViewModel;
 
 public class BeatBoxFragment extends Fragment {
+    private BeatBox mBeatBox;
     public static BeatBoxFragment newFragment(){
         return new BeatBoxFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //保留fragment
+        setRetainInstance(true);
+        mBeatBox = new BeatBox(getActivity());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBeatBox.release();
     }
 
     @Nullable
@@ -25,7 +45,7 @@ public class BeatBoxFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentBeatBoxBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_beat_box,container,false);
         binding.recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));
-        binding.recyclerView.setAdapter(new SoundAdapter());
+        binding.recyclerView.setAdapter(new SoundAdapter(mBeatBox.getSounds()));
         return binding.getRoot();
     }
 
@@ -34,10 +54,21 @@ public class BeatBoxFragment extends Fragment {
         public SoundHolder(ListItemSoundBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
+            mBinding.setViewModel(new SoundViewModel(mBeatBox));
+        }
+
+        public void bind(Sound sound){
+            mBinding.getViewModel().setSound(sound);
+            mBinding.executePendingBindings();
         }
     }
 
     private class SoundAdapter extends RecyclerView.Adapter<SoundHolder>{
+        private List<Sound> mSounds;
+
+        public SoundAdapter(List<Sound> mSounds) {
+            this.mSounds = mSounds;
+        }
 
         @NonNull
         @Override
@@ -48,12 +79,13 @@ public class BeatBoxFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull SoundHolder soundHolder, int i) {
-
+            Sound sound = mSounds.get(i);
+            soundHolder.bind(sound);
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return mSounds.size();
         }
     }
 }
