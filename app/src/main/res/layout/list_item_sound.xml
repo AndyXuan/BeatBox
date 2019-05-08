@@ -6,12 +6,18 @@
             name="viewModel"
             type="me.xdd.self.beatbox.viewmodel.SoundViewModel"/>
     </data>
-    <Button
-        style="@style/BeatBoxButton.Strong"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        tools:text="Sound name"
-        android:text="@{viewModel.title}"
-        android:onClick="@{() -> viewModel.onButtonClicked()}"
-        />
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            tools:text="Sound name"
+            android:text="@{viewModel.title}"
+            android:onClick="@{() -> viewModel.onButtonClicked()}"
+            />
+    </FrameLayout>
+
 </layout>
